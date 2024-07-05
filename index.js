@@ -2,6 +2,7 @@ const express = require('express');
 const request = require('request');
 const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid'); // Modul UUID untuk menghasilkan nama acak
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -28,9 +29,16 @@ app.post('/download', async (req, res) => {
 
     try {
         const videoBuffer = await downloadVideo(url);
+        const fileName = `${uuidv4()}.mp4`; // Nama file acak dengan ekstensi .mp4
+        const filePath = path.join(__dirname, 'videos', fileName); // Menyimpan file di direktori videos
+
+        // Menyimpan file video yang diunduh
+        fs.writeFileSync(filePath, videoBuffer);
+
+        // Menyiapkan respons untuk pengguna
         res.set({
             'Content-Type': 'video/mp4',
-            'Content-Disposition': 'attachment; filename="video.mp4"'
+            'Content-Disposition': `attachment; filename="${fileName}"`
         });
         res.send(videoBuffer);
     } catch (error) {
