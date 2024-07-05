@@ -9,12 +9,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Unduh Video TikTok</h1>
+        <h1>Tools Unduh Video TikTok dan Youtube</h1>
         <% if (typeof error !== 'undefined') { %>
             <p style="color: red;"><%= error %></p>
         <% } %>
         <form action="/download" method="post">
-            <label for="url">URL Video TikTok:</label><br>
+            <label for="url">URL Video TikTok/Youtube:</label><br>
             <input type="text" id="url" name="url" placeholder="Masukkan URL video..." style="width: 300px;"><br><br>
             <button type="submit">Unduh Video</button>
         </form>
