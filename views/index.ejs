@@ -1,0 +1,23 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unduh Video TikTok</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Opsional: CSS untuk styling -->
+</head>
+<body>
+    <div class="container">
+        <h1>Unduh Video TikTok</h1>
+        <% if (typeof error !== 'undefined') { %>
+            <p style="color: red;"><%= error %></p>
+        <% } %>
+        <form action="/download" method="post">
+            <label for="url">URL Video TikTok:</label><br>
+            <input type="text" id="url" name="url" placeholder="Masukkan URL video..." style="width: 300px;"><br><br>
+            <button type="submit">Unduh Video</button>
+        </form>
+    </div>
+</body>
+</html>
