@@ -1,8 +1,6 @@
 const express = require('express');
 const request = require('request');
-const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid'); // Import uuid untuk menghasilkan nama acak
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -28,13 +26,17 @@ app.post('/download', async (req, res) => {
     }
 
     try {
-        const videoBuffer = await downloadVideo(url);
-        const fileName = `${uuidv4()}.mp4`; // Nama file acak dengan ekstensi .mp4
-        res.set({
-            'Content-Type': 'video/mp4',
-            'Content-Disposition': `attachment; filename="${fileName}"`
-        });
-        res.send(videoBuffer);
+        const result = await downloadVideo(url);
+        
+        if (result.status === 'redirect') {
+            res.redirect(result.url);
+        } else {
+            res.set({
+                'Content-Type': 'video/mp4',
+                'Content-Disposition': `attachment; filename="${result.filename}"`
+            });
+            res.send(result.videoBuffer);
+        }
     } catch (error) {
         console.error('Error:', error);
         res.render('index', { error: 'Gagal mengunduh video. Silakan coba lagi.' });
@@ -54,16 +56,22 @@ function downloadVideo(url) {
             } else if (response.statusCode !== 200) {
                 reject(`Gagal mengunduh video. Status code: ${response.statusCode}`);
             } else {
-                const video_url = body.url;
-
-                // Menggunakan request untuk mengambil buffer dari video
-                request.get({ url: video_url, encoding: null }, (err, response, videoBuffer) => {
-                    if (err) {
-                        reject(`Gagal mengunduh video. Error: ${err}`);
-                    } else {
-                        resolve(videoBuffer);
-                    }
-                });
+                if (body.status === 'redirect') {
+                    resolve({ status: 'redirect', url: body.url });
+                } else {
+                    const video_url = body.url;
+                    // Generate a random filename
+                    const filename = `video_${Math.random().toString(36).substring(7)}.mp4`;
+                    
+                    // Menggunakan request untuk mengambil buffer dari video
+                    request.get({ url: video_url, encoding: null }, (err, response, videoBuffer) => {
+                        if (err) {
+                            reject(`Gagal mengunduh video. Error: ${err}`);
+                        } else {
+                            resolve({ status: 'download', filename, videoBuffer });
+                        }
+                    });
+                }
             }
         });
     });
