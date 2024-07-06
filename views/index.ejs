@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tools Unduh Video TikTok dan Youtube</title>
+    <title>Tools Unduh Video Sosmed</title>
     <link rel="stylesheet" href="/css/style.css"> <!-- Opsional: CSS untuk styling -->
 </head>
 <body>
     <div class="container">
-        <h1>Tools Unduh Video TikTok dan Youtube</h1>
+        <h1>Unduh Video TikTok,Instagram,Youtube</h1>
         <% if (typeof error !== 'undefined') { %>
             <p style="color: red;"><%= error %></p>
         <% } %>
         <form action="/download" method="post">
-            <label for="url">URL Video TikTok atau Youtube:</label><br>
+            <label for="url">URL Video:</label><br>
             <input type="text" id="url" name="url" placeholder="Masukkan URL video..." style="width: 300px;"><br><br>
             <button type="submit">Unduh Video</button>
         </form>
