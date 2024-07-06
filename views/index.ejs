@@ -1,4 +1,3 @@
-<!-- views/index.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,10 +13,15 @@
             <p style="color: red;"><%= error %></p>
         <% } %>
         <form action="/download" method="post">
-            <label for="url">URL Video TikTok/Youtube:</label><br>
+            <label for="url">URL Video TikTok atau Youtube:</label><br>
             <input type="text" id="url" name="url" placeholder="Masukkan URL video..." style="width: 300px;"><br><br>
             <button type="submit">Unduh Video</button>
         </form>
+        <ul>
+            <li><a href="https://twtv.tipiku.my.id/">Unduh video Twitter</a></li>
+            <li><a href="https://efbi.tipiku.my.id/">Unduh video Facebook</a></li>
+            <!-- Tambahkan tautan lain di sini jika diperlukan -->
+        </ul>
     </div>
 </body>
 </html>
