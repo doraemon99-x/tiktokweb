@@ -2,27 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tools Unduh Video Sosmed</title>
-    <link rel="stylesheet" href="/css/style.css"> <!-- Opsional: CSS untuk styling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Unduh Video TikTok</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #34495e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px;
+        }
+        .btn-primary {
+            background-color: #2980b9;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #3498db;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Unduh Video TikTok,Instagram,
-            Youtube</h1>
+    <div class="container text-center">
+        <h2 class="mt-3">Unduh Video TikTok,Instagram,
+            YouTube</h2>
         <% if (typeof error !== 'undefined') { %>
-            <p style="color: red;"><%= error %></p>
+            <div class="alert alert-danger" role="alert">
+                <%= error %>
+            </div>
         <% } %>
-        <form action="/download" method="post">
-            <label for="url">URL Video:</label><br>
-            <input type="text" id="url" name="url" placeholder="Masukkan URL video..." style="width: 300px;"><br><br>
-            <button type="submit">Unduh Video</button>
+        <form action="/download" method="post" class="mt-4">
+            <div class="form-group">
+                <label for="url">URL Video:</label>
+                <input type="text" id="url" name="url" class="form-control" placeholder="Masukkan URL video..." required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Unduh Video</button>
         </form>
-        <ul>
-            <li><a href="https://twtv.tipiku.my.id/">Unduh video Twitter</a></li>
-            <li><a href="https://efbi.tipiku.my.id/">Unduh video Facebook</a></li>
+        <ul class="list-unstyled mt-4">
+            <li><a href="https://twtv.tipiku.my.id/" class="btn btn-link">Unduh Twitter</a></li>
+            <li><a href="https://efbi.tipiku.my.id/" class="btn btn-link">Unduh Facebook</a></li>
             <!-- Tambahkan tautan lain di sini jika diperlukan -->
         </ul>
     </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
