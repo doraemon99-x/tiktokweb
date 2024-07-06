@@ -2,6 +2,7 @@ const express = require('express');
 const request = require('request');
 const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid'); // Import uuid untuk menghasilkan nama acak
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -28,9 +29,10 @@ app.post('/download', async (req, res) => {
 
     try {
         const videoBuffer = await downloadVideo(url);
+        const fileName = `${uuidv4()}.mp4`; // Nama file acak dengan ekstensi .mp4
         res.set({
             'Content-Type': 'video/mp4',
-            'Content-Disposition': 'attachment; filename="video.mp4"'
+            'Content-Disposition': `attachment; filename="${fileName}"`
         });
         res.send(videoBuffer);
     } catch (error) {
@@ -43,7 +45,7 @@ app.post('/download', async (req, res) => {
 function downloadVideo(url) {
     return new Promise((resolve, reject) => {
         const api_url = 'https://api.cobalt.tools/api/json';
-        const payload = { url };
+        const payload = { url, vQuality: '1080' };
         const headers = { 'Accept': 'application/json' };
 
         request.post({ url: api_url, json: payload, headers }, (err, response, body) => {
@@ -53,7 +55,7 @@ function downloadVideo(url) {
                 reject(`Gagal mengunduh video. Status code: ${response.statusCode}`);
             } else {
                 const video_url = body.url;
-                
+
                 // Menggunakan request untuk mengambil buffer dari video
                 request.get({ url: video_url, encoding: null }, (err, response, videoBuffer) => {
                     if (err) {
