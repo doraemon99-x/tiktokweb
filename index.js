@@ -1,11 +1,12 @@
 const express = require('express');
 const request = require('request');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Set view engine menggunakan EJS (opsional, tergantung kebutuhan Anda)
+// Set view engine menggunakan EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-// Handler untuk form submit
+// Handler untuk form submit video
 app.post('/download', async (req, res) => {
     const url = req.body.url;
     if (!url) {
@@ -26,20 +27,35 @@ app.post('/download', async (req, res) => {
     }
 
     try {
-        const result = await downloadVideo(url);
-        
-        if (result.status === 'redirect') {
-            res.redirect(result.url);
-        } else {
-            res.set({
-                'Content-Type': 'video/mp4',
-                'Content-Disposition': `attachment; filename="${result.filename}"`
-            });
-            res.send(result.videoBuffer);
-        }
+        const videoBuffer = await downloadVideo(url);
+        res.set({
+            'Content-Type': 'video/mp4',
+            'Content-Disposition': `attachment; filename="${generateRandomFileName('mp4')}"`
+        });
+        res.send(videoBuffer);
     } catch (error) {
         console.error('Error:', error);
         res.render('index', { error: 'Gagal mengunduh video. Silakan coba lagi.' });
+    }
+});
+
+// Handler untuk form submit MP3
+app.post('/download-mp3', async (req, res) => {
+    const url = req.body.url;
+    if (!url) {
+        return res.render('index', { error: 'URL tidak boleh kosong' });
+    }
+
+    try {
+        const audioBuffer = await downloadMP3(url);
+        res.set({
+            'Content-Type': 'audio/mpeg',
+            'Content-Disposition': `attachment; filename="${generateRandomFileName('mp3')}"`
+        });
+        res.send(audioBuffer);
+    } catch (error) {
+        console.error('Error:', error);
+        res.render('index', { error: 'Gagal mengunduh MP3. Silakan coba lagi.' });
     }
 });
 
@@ -47,7 +63,7 @@ app.post('/download', async (req, res) => {
 function downloadVideo(url) {
     return new Promise((resolve, reject) => {
         const api_url = 'https://api.cobalt.tools/api/json';
-        const payload = { url, vQuality: '1080' };
+        const payload = { url, vQuality: '1080', vCodec: 'av1' };
         const headers = { 'Accept': 'application/json' };
 
         request.post({ url: api_url, json: payload, headers }, (err, response, body) => {
@@ -57,24 +73,72 @@ function downloadVideo(url) {
                 reject(`Gagal mengunduh video. Status code: ${response.statusCode}`);
             } else {
                 if (body.status === 'redirect') {
-                    resolve({ status: 'redirect', url: body.url });
+                    resolve(downloadFromRedirect(body.url));
                 } else {
                     const video_url = body.url;
-                    // Generate a random filename
-                    const filename = `video_${Math.random().toString(36).substring(7)}.mp4`;
-                    
                     // Menggunakan request untuk mengambil buffer dari video
                     request.get({ url: video_url, encoding: null }, (err, response, videoBuffer) => {
                         if (err) {
                             reject(`Gagal mengunduh video. Error: ${err}`);
                         } else {
-                            resolve({ status: 'download', filename, videoBuffer });
+                            resolve(videoBuffer);
                         }
                     });
                 }
             }
         });
     });
+}
+
+// Fungsi untuk mengunduh MP3 dari URL menggunakan Cobalt API
+function downloadMP3(url) {
+    return new Promise((resolve, reject) => {
+        const api_url = 'https://api.cobalt.tools/api/json';
+        const payload = { url, vQuality: '1080', isAudioOnly: 'true', isTTFullAudio: true };
+        const headers = { 'Accept': 'application/json' };
+
+        request.post({ url: api_url, json: payload, headers }, (err, response, body) => {
+            if (err) {
+                reject(`Gagal mengunduh MP3. Error: ${err}`);
+            } else if (response.statusCode !== 200) {
+                reject(`Gagal mengunduh MP3. Status code: ${response.statusCode}`);
+            } else {
+                if (body.status === 'redirect') {
+                    resolve(downloadFromRedirect(body.url));
+                } else {
+                    const audio_url = body.url;
+                    // Menggunakan request untuk mengambil buffer dari audio
+                    request.get({ url: audio_url, encoding: null }, (err, response, audioBuffer) => {
+                        if (err) {
+                            reject(`Gagal mengunduh MP3. Error: ${err}`);
+                        } else {
+                            resolve(audioBuffer);
+                        }
+                    });
+                }
+            }
+        });
+    });
+}
+
+// Fungsi untuk mengunduh dari URL redirect
+function downloadFromRedirect(url) {
+    return new Promise((resolve, reject) => {
+        request.get({ url, encoding: null }, (err, response, buffer) => {
+            if (err) {
+                reject(`Gagal mengunduh file. Error: ${err}`);
+            } else {
+                resolve(buffer);
+            }
+        });
+    });
+}
+
+// Fungsi untuk menghasilkan nama file acak
+function generateRandomFileName(extension) {
+    const timestamp = new Date().getTime();
+    const random = Math.floor(Math.random() * 10000);
+    return `file_${timestamp}_${random}.${extension}`;
 }
 
 // Mulai server Express
